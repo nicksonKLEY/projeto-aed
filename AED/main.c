@@ -862,6 +862,7 @@ int main(){
 
 							 }else
 							 {
+								 
 								 minIndex->finalTime += timeLine + timeAtend;
 //								 middleTimePDV[minIndex] = middleTimePDV[minIndex] + timeAtend;
 								 attendedPeoples[minIndex]++;
