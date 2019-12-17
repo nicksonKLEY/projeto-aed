@@ -109,7 +109,7 @@ int main(){
 	List *pastFaPdvs = createList();
 	int pastAmountPdv;
 
-	scanf("%d\n", &pastAmountPdv);
+	scanf("%d", &pastAmountPdv);
 
 	for(int i=0;i < pastAmountPdv;i++){
 
@@ -138,7 +138,7 @@ int main(){
 	List *newFaPdvs = createList();
 	int newAmountPdv;
 
-	scanf("%d\n", &newAmountPdv);
+	scanf("%d", &newAmountPdv);
 
 	for(int i=0;i < newAmountPdv;i++){
 
@@ -201,7 +201,7 @@ int main(){
 	//MARK: - leitura dos fatores de agilidade
 
 	int mediaFA;
-	scanf("%d\n",&mediaFA);
+	scanf("%d",&mediaFA);
 
 	//MARK: - multiplicando todos os fatores
 
@@ -228,14 +228,13 @@ int main(){
 
 	int esperaT2, esperaFilaT3, esperaAtendimentoT3;
 
-	scanf("%d %d %d\n", &esperaT2, &esperaFilaT3, & esperaAtendimentoT3);
+	scanf("%d %d %d", &esperaT2, &esperaFilaT3, & esperaAtendimentoT3);
 
 	//MARK: - Leitura de eventos
 	char inputEvent;
 
 	do{
 		scanf("%c ", &inputEvent);
-//		printf("%c", inputEvent);
 		switch(inputEvent){
 		case 'C':
 			{
@@ -243,7 +242,7 @@ int main(){
 				Pdv *minorTimeAttending = NULL;
 				int itensCountC, clientTypeC, timeToPayC;
 
-				scanf("%lf %d %d %d\n", &timeEventC, &itensCountC, &clientTypeC, &timeToPayC);
+				scanf("%lf %d %d %d", &timeEventC, &itensCountC, &clientTypeC, &timeToPayC);
 
 				timeToPayC *= 1000;
 
@@ -297,6 +296,7 @@ int main(){
 
 				}
 
+				minorTimeAttending->attendedPeoples++;
 				printf("%d       %f      %f\n", minorTimeAttending->index, timeEventC,minorTimeAttending->finalTime);
 				minorTimeAttending->sumTime += minTimeValue;
 
@@ -307,20 +307,27 @@ int main(){
 			{
 				double coisa;
 				int coisa1, coisa2;
-				scanf("%lf %d %d\n",&coisa,&coisa1,&coisa2);
+				scanf("%lf %d %d",&coisa,&coisa1,&coisa2);
 
 				break;
+			}
+		case 'F':
+			{
+				goto a;
 			}
 		}
 	}while (inputEvent != 'F');
 
+a:;
 	Element *medias = allPdvs->first;
 
 	while (medias != NULL) {
 
 		Pdv *pdv = medias->value;
 
-		printf("PDV: %d; media:%lf\n",pdv->index,(pdv->sumTime/pdv->attendedPeoples));
+		double coisa = pdv->sumTime/pdv->attendedPeoples;
+
+		printf("\nPDV: %d; media: %lf",pdv->index,coisa);
 
 		medias = medias->next;
 	}
