@@ -241,6 +241,10 @@ int main(){
 
 	scanf("%d %d %d", &esperaT2, &esperaFilaT3, & esperaAtendimentoT3);
 
+	//MARK: - Produtos desperdicados
+
+	int type2 = 0, type3 = 0;
+
 	//MARK: - Leitura de eventos
 	char inputEvent;
 
@@ -298,12 +302,69 @@ int main(){
 
 				if(timeEventC - minorTimeAttending->finalTime > 0){
 
+					if(minTimeValue > esperaAtendimentoT3 && clientTypeC ==3){
+
+						minorTimeAttending->finalTime += esperaAtendimentoT3;
+						type3 += itensCountC;
+
+						break;
+
+					}
+
 					minorTimeAttending->finalTime += minTimeValue + (timeEventC - minorTimeAttending->finalTime);
+
+				}
+				else if(timeEventC - minorTimeAttending->finalTime == 0){
+
+					if(minTimeValue > esperaAtendimentoT3 && clientTypeC ==3){
+
+						minorTimeAttending->finalTime += esperaAtendimentoT3;
+						type3 += itensCountC;
+
+						break;
+
+					}
+
+					minorTimeAttending->finalTime += minTimeValue;
 
 				}
 				else{
 
-					minorTimeAttending->finalTime += timeEventC + minTimeValue;
+					if((minorTimeAttending->finalTime - timeEventC) > esperaFilaT3 && clientTypeC == 3){
+
+						type3 += itensCountC;
+
+						break;
+
+					}
+
+					if(minTimeValue > esperaAtendimentoT3 && clientTypeC ==3){
+
+						minorTimeAttending->finalTime += esperaAtendimentoT3;
+
+						type3 += itensCountC;
+
+						break;
+
+					}
+
+					minorTimeAttending->finalTime += minTimeValue;
+
+				}
+
+				if(minorTimeAttending->finalTime == minTimeValue){
+
+					minorTimeAttending->finalTime += timeEventC;
+
+				}
+
+				if((minorTimeAttending->finalTime - timeEventC) > esperaT2 && clientTypeC == 2){
+
+					minorTimeAttending->finalTime -= ((minorTimeAttending->finalTime - timeEventC) - esperaT2);
+
+					type2 += itensCountC;
+
+					break;
 
 				}
 
@@ -328,9 +389,72 @@ int main(){
 
 		case 'S':
 			{
-				double coisa;
-				int coisa1, coisa2;
-				scanf("%lf %d %d",&coisa,&coisa1,&coisa2);
+				double timeEventS;
+				int index, timeStop;
+				scanf("%lf %d %d",&timeEventS,&index,&timeStop);
+
+				index-=1;
+
+				Element * caminhador = allPdvs->first;
+				Pdv * real = NULL;
+
+				while (caminhador != NULL) {
+
+					Pdv *pdv = caminhador->value;
+
+					if (pdv->index == index){
+
+						real = pdv;
+
+						break;
+
+					}
+
+					caminhador = caminhador->next;
+
+				}
+
+				if(real == NULL){
+
+					printf("deu bosta\n");
+
+				}
+				else{
+
+					if((real->finalTime - timeEventS) > 0){
+
+						double value = timeStop * 60;
+						double mileseconds = value * 1000;
+
+						if((mileseconds - (real->finalTime - timeEventS))>=0){
+
+							real->finalTime += (mileseconds - (real->finalTime - timeEventS));
+
+						}
+
+					}
+					else if((real->finalTime - timeEventS) == 0){
+
+						double value = timeStop * 60;
+						double mileseconds = value * 1000;
+
+						real->finalTime += mileseconds;
+
+					}
+					else{
+
+						double value = timeStop * 60;
+						double mileseconds = value * 1000;
+
+						if((mileseconds - (real->finalTime - timeEventS))>=0){
+
+							real->finalTime += (mileseconds +(timeEventS - real->finalTime));
+
+						}
+
+					}
+
+				}
 
 				break;
 			}
@@ -347,7 +471,7 @@ int main(){
 
 		double coisa = pdv->sumTime/pdv->attendedPeoples;
 
-		printf("\nPDV: %d; media: %lf; max: %lf",pdv->index,coisa,pdv->maxTime);
+		printf("\nPDV: %d; media: %lf; max: %lf",pdv->index+1,coisa,pdv->maxTime);
 
 		medias = medias->next;
 	}
@@ -362,10 +486,14 @@ int main(){
 
 		double coisa = pdv->pdvSumTime/pdv->attendedPeoples;
 
-		printf("\nPDV: %d; media: %lf; max: %lf",pdv->index,coisa,pdv->pdvMaxTime);
+		printf("\nPDV: %d; media: %lf; max: %lf",pdv->index+1,coisa,pdv->pdvMaxTime);
 
 		medias = medias->next;
 	}
+
+	printf("\n------------------------droped itens-------------------");
+	printf("\ntipo 2: %d",type2);
+	printf("\ntipo 3: %d", type3);
 
 	return 0;
 
