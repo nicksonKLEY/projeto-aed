@@ -111,7 +111,7 @@ void append(void *value, List *list){
 int main(){
 
 	//MARK: - leitura dos pdvs antigos
-	List *pastFaPdvs = createList();
+	List *pastFaPdvs = createList();//lista com os pdvs antigos
 	int pastAmountPdv;
 
 	scanf("%d", &pastAmountPdv);
@@ -143,7 +143,7 @@ int main(){
 	}
 
 	//MARK: - leitura dos pdvs novos
-	List *newFaPdvs = createList();
+	List *newFaPdvs = createList();//lista com os novos pdv
 	int newAmountPdv;
 
 	scanf("%d", &newAmountPdv);
@@ -176,10 +176,11 @@ int main(){
 
 	//MARK: - criando uma lista com todos os pdv
 
-	List *allPdvs = malloc(sizeof(List));
+	List *allPdvs = malloc(sizeof(List));//lista que une os pdvs antigos e os novos
 
 	Element *caminhador = pastFaPdvs->first;
 
+	//leitura dos pdvs antigos para inserrir na lista de todos
 	while(caminhador != NULL){
 
 		Pdv *pdv = (Pdv *)caminhador->value;
@@ -194,6 +195,7 @@ int main(){
 
 	Element *newCaminhador = newFaPdvs->first;
 
+	//leitura dos pdvs novos para inserrir na lista de todos
 	while(newCaminhador != NULL){
 
 		Pdv *pdv = (Pdv *)newCaminhador->value;
@@ -201,9 +203,6 @@ int main(){
 		pdv->index = allPdvs->count;
 
 		append(pdv, allPdvs);
-
-
-		//		printf("%d\n", pdv->index);
 
 		newCaminhador = newCaminhador->next;
 
@@ -218,6 +217,7 @@ int main(){
 
 	Element *allCaminhador = allPdvs->first;
 
+	//multiplicanto o fator de agilidade de todos os pdv pela media de agilidade dos pdvs
 	while(allCaminhador != NULL){
 
 		Pdv *pdv = (Pdv *)allCaminhador->value;
@@ -253,13 +253,15 @@ int main(){
 		switch(inputEvent){
 		case 'C':
 			{
+				//leitura de evento de chageada de cliente
 				double timeEventC;
 				Pdv *minorTimeAttending = NULL;
 				int itensCountC, clientTypeC, timeToPayC;
 
 				scanf("%lf %d %d %d", &timeEventC, &itensCountC, &clientTypeC, &timeToPayC);
 
-				timeToPayC *= 1000;
+				//como tempo de pagamento foi considerado em segundos
+				timeToPayC *= 1000;// tranformamos ele pata millesegundos
 
 				Pdv *first = (Pdv *)allPdvs->first->value;
 
@@ -267,6 +269,7 @@ int main(){
 
 				Element *caminhador = allPdvs->first;
 
+				//varrendo todos os pdv para ver se tem algum que esteja desocupado no momento de chegada do cliente
 				while (caminhador != NULL) {
 					Pdv *atual = (Pdv *)caminhador->value;
 
@@ -278,6 +281,7 @@ int main(){
 					caminhador = caminhador->next;
 				}
 
+				//caso nao tenha nenhum desocupado ele associa a chegada do cliente a uma espera e depois se encaminha para o primeiro que desocupar
 				if(minorTimeAttending == NULL){
 
 					minorTimeAttending = first;
@@ -300,8 +304,9 @@ int main(){
 
 				}
 
+				//caso o cliente chegue e tenha um caixa a muito desocupado o relogio do pdv tem que contar esse tempo ocioso
 				if(timeEventC - minorTimeAttending->finalTime > 0){
-
+					//verificacao se um cliente de um tipo 3 ficou mais tempo que precisava em um atendimento
 					if(minTimeValue > esperaAtendimentoT3 && clientTypeC ==3){
 
 						minorTimeAttending->finalTime += esperaAtendimentoT3;
@@ -314,8 +319,11 @@ int main(){
 					minorTimeAttending->finalTime += minTimeValue + (timeEventC - minorTimeAttending->finalTime);
 
 				}
+
+				//chegada de cliente no exto momento em que o caixa fica livre
 				else if(timeEventC - minorTimeAttending->finalTime == 0){
 
+					//verificacao se um cliente de um tipo 3 ficou mais tempo que precisava em um atendimento
 					if(minTimeValue > esperaAtendimentoT3 && clientTypeC ==3){
 
 						minorTimeAttending->finalTime += esperaAtendimentoT3;
@@ -328,8 +336,11 @@ int main(){
 					minorTimeAttending->finalTime += minTimeValue;
 
 				}
+
+				//cliente chegando e todos os caixas estejam ocupados
 				else{
 
+					//caso um cliente do tipo 3 tem ficado tempo demais na fila
 					if((minorTimeAttending->finalTime - timeEventC) > esperaFilaT3 && clientTypeC == 3){
 
 						type3 += itensCountC;
@@ -338,6 +349,7 @@ int main(){
 
 					}
 
+					//verificacao se um cliente de um tipo 3 ficou mais tempo que precisava em um atendimento
 					if(minTimeValue > esperaAtendimentoT3 && clientTypeC ==3){
 
 						minorTimeAttending->finalTime += esperaAtendimentoT3;
@@ -352,12 +364,14 @@ int main(){
 
 				}
 
+				//caso o cliente seja o primeiro do pdv esse será o horario de inicio do pdv
 				if(minorTimeAttending->finalTime == minTimeValue){
 
 					minorTimeAttending->finalTime += timeEventC;
 
 				}
 
+				//verificando se o cliente do tipo 2 esperou mais tempo do que era seu limite
 				if((minorTimeAttending->finalTime - timeEventC) > esperaT2 && clientTypeC == 2){
 
 					minorTimeAttending->finalTime -= ((minorTimeAttending->finalTime - timeEventC) - esperaT2);
@@ -368,19 +382,19 @@ int main(){
 
 				}
 
-				minorTimeAttending->attendedPeoples++;
+				minorTimeAttending->attendedPeoples++;//contagem de clientes atendidos
 				printf("%d       %f      %f\n", minorTimeAttending->index, timeEventC,minorTimeAttending->finalTime);
 
-				minorTimeAttending->sumTime += minTimeValue;
+				minorTimeAttending->sumTime += minTimeValue;//soma do tempo de atendimento para tirar a media
 				if(minTimeValue > minorTimeAttending->maxTime){
 
-					minorTimeAttending->maxTime = minTimeValue;
+					minorTimeAttending->maxTime = minTimeValue;// max value
 
 				}
 
-				minorTimeAttending->pdvSumTime += (minorTimeAttending->finalTime - timeEventC);
+				minorTimeAttending->pdvSumTime += (minorTimeAttending->finalTime - timeEventC);//soma do tempo de area de pdv
 				if((minorTimeAttending->finalTime - timeEventC) > minorTimeAttending->pdvMaxTime){
-					minorTimeAttending->pdvMaxTime = (minorTimeAttending->finalTime - timeEventC);
+					minorTimeAttending->pdvMaxTime = (minorTimeAttending->finalTime - timeEventC);// max value
 				}
 
 
@@ -398,6 +412,7 @@ int main(){
 				Element * caminhador = allPdvs->first;
 				Pdv * real = NULL;
 
+				//catando o pdv que tenha esse index
 				while (caminhador != NULL) {
 
 					Pdv *pdv = caminhador->value;
@@ -421,6 +436,7 @@ int main(){
 				}
 				else{
 
+					//caso o inicio da parada ocorra no meio de um atendimento
 					if((real->finalTime - timeEventS) > 0){
 
 						double value = timeStop * 60;
@@ -433,6 +449,7 @@ int main(){
 						}
 
 					}
+					//caso de parada no exato momento em que o caia fica livre
 					else if((real->finalTime - timeEventS) == 0){
 
 						double value = timeStop * 60;
@@ -441,6 +458,8 @@ int main(){
 						real->finalTime += mileseconds;
 
 					}
+
+					//caso o caixa tenha ficado ocioso antes de uma parada
 					else{
 
 						double value = timeStop * 60;
