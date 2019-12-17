@@ -706,6 +706,7 @@ int main(){
         pastPdvs->maxTimeWait = 0;
         pastPdvs->mediaTimeAtend = 0;
         pastPdvs->mediaTimeWait = 0;
+		pastPdvs->finalTime = 0;
 
         append(pastPdvs,pastFaPdvs);
 
@@ -733,6 +734,7 @@ int main(){
         newPdv->maxTimeWait = 0;
         newPdv->mediaTimeAtend = 0;
         newPdv->mediaTimeWait = 0;
+		newPdv->finalTime = 0;
 
         append(newPdv,newFaPdvs);
 
@@ -815,14 +817,14 @@ int main(){
 		switch(inputEvent){
 			 case 'C':
 				 {
-					 float timeEventC;
-					 int itensCountC, clientTypeC, timeToPayC;
+					float timeEventC;
+					int itensCountC, clientTypeC, timeToPayC;
 
-					 scanf("%f %d %d %d", &timeEventC, &itensCountC, &clientTypeC, &timeToPayC);
+					scanf("%f %d %d %d", &timeEventC, &itensCountC, &clientTypeC, &timeToPayC);
 
-					 Pdv *minIndex = malloc(sizeof(Pdv));
+					Pdv *minIndex;
 
-					Pdv *first = (Pdv *)allPdvs->first;
+					Pdv *first = (Pdv *)allPdvs->first->value;
 					float minTimeValue = first->agility * itensCountC + timeToPayC;
 
 					 Element *caminhador = allPdvs->first;
@@ -835,7 +837,7 @@ int main(){
 							 minIndex = atual;
 						 }
 						 if((atual->agility * itensCountC + timeToPayC) < minTimeValue && atual->finalTime <= timeEventC + (atual->agility * itensCountC + timeToPayC)){
-							 minTimeValue = atual->agility *itensCountC + timeToPayC;
+							 minTimeValue = atual->agility * itensCountC + timeToPayC;
 							 minIndex = atual;
 						 }
 
@@ -862,20 +864,19 @@ int main(){
 
 							 }else
 							 {
-								 
 								 minIndex->finalTime += timeLine + timeAtend;
 //								 middleTimePDV[minIndex] = middleTimePDV[minIndex] + timeAtend;
-								 attendedPeoples[minIndex]++;
+								 minIndex->attendedPeoples++;
 							 }
 							 break;
 						 case 3:
-							 if(timeLine > timeLineType3 || timeAtend > timeAtendType3){
+							 if(timeLine > esperaFilaT3 || timeAtend > esperaAtendimentoT3){
 
 							 } else
 							 {
-								 finalTime[minIndex] += timeLine + timeAtend;
-								 middleTimePDV[minIndex] = middleTimePDV[minIndex] + timeAtend;
-								 attendedPeoples[minIndex]++;
+								 minIndex->finalTime += timeLine + timeAtend;
+//								 middleTimePDV[minIndex] = middleTimePDV[minIndex] + timeAtend;
+								 minIndex->attendedPeoples++;
 							 }
 
 							 break;
@@ -888,23 +889,23 @@ int main(){
 						 switch (clientTypeC)
 						 {
 						 case 2:
-							 if(timeLine + timeAtend > timeType2){
+							 if(timeLine + timeAtend > esperaT2){
 
 							 }else
 							 {
-								 finalTime[minIndex] += timeLine + timeAtend;
-								 middleTimePDV[minIndex] = middleTimePDV[minIndex] + timeAtend;
-								 attendedPeoples[minIndex]++;
+								 minIndex->finalTime += timeLine + timeAtend;
+//								 middleTimePDV[minIndex] = middleTimePDV[minIndex] + timeAtend;
+								 minIndex->attendedPeoples++;
 							 }
 							 break;
 						 case 3:
-							 if(timeLine > timeLineType3 || timeAtend > timeAtendType3){
+							 if(timeLine > esperaFilaT3 || timeAtend > esperaAtendimentoT3){
 
 							 } else
 							 {
-								 finalTime[minIndex] += timeLine + timeAtend;
-								 middleTimePDV[minIndex] = middleTimePDV[minIndex] + timeAtend;
-								 attendedPeoples[minIndex]++;
+								 minIndex->finalTime += timeLine + timeAtend;
+//								 middleTimePDV[minIndex] = middleTimePDV[minIndex] + timeAtend;
+								 minIndex->attendedPeoples++;
 							 }
 
 							 break;
@@ -913,52 +914,38 @@ int main(){
 						 }
 					 }
 
-					 printf("\n%d       %f      %f                  %f", minIndex, timeEventC,finalTime[minIndex], middleTimePDV[minIndex]);
-
-					 Event *evento = malloc(sizeof(Event));
-
-					 evento->typeEvent = 'C';
-					 evento->timeEvent = timeEventC;
-
-					 ArriveClient  *client = malloc(sizeof(ArriveClient));
-
-					 client->itensCount = itensCountC;
-					 client->clientType = clientTypeC;
-					 client->timeToPay = timeToPayC;
-
-					 evento->event = client;
-
-					 append(evento,eventsSchedule->events);
+//					 printf("\n%d       %f      %f                  %f", minIndex, timeEventC,minIndex->finalTime, middleTimePDV[minIndex]);
+					 printf("\n%d       %f      %f                  ", minIndex->index, timeEventC,minIndex->finalTime);
 
 					 break;
 				 }
 			 case 'S':
 				 {
-					 float timeEventS;
-					 int indexPdv, duration;
-
-					 scanf("%f %d %d", &timeEventS, &indexPdv, &duration);
-
-					 float timeStand = timeEventS + (duration * 60) - finalTime[indexPdv];
-					 finalTime[indexPdv] += timeStand;
-
-					 printf("\nO PDV %d parou em %f, durante %d segundos.           %f", indexPdv, timeEventS, (duration * 60), finalTime[indexPdv]);
-
-					 Event * evento = malloc(sizeof(Event));
-
-					 evento->typeEvent = 'S';
-					 evento->timeEvent = timeEventS;
-
-					 PdvSuspension *suspension = malloc(sizeof(PdvSuspension));
-
-					 suspension->indexPdv = indexPdv;
-					 suspension->timeDuration = duration;
-
-					 evento->event = suspension;
-
-					 append(evento, eventsSchedule->events);
-
-					 break;
+//					 float timeEventS;
+//					 int indexPdv, duration;
+//
+//					 scanf("%f %d %d", &timeEventS, &indexPdv, &duration);
+//
+//					 float timeStand = timeEventS + (duration * 60) - finalTime[indexPdv];
+//					 finalTime[indexPdv] += timeStand;
+//
+//					 printf("\nO PDV %d parou em %f, durante %d segundos.           %f", indexPdv, timeEventS, (duration * 60), finalTime[indexPdv]);
+//
+//					 Event * evento = malloc(sizeof(Event));
+//
+//					 evento->typeEvent = 'S';
+//					 evento->timeEvent = timeEventS;
+//
+//					 PdvSuspension *suspension = malloc(sizeof(PdvSuspension));
+//
+//					 suspension->indexPdv = indexPdv;
+//					 suspension->timeDuration = duration;
+//
+//					 evento->event = suspension;
+//
+//					 append(evento, eventsSchedule->events);
+//
+//					 break;
 				 }
 			 default:
 				 break;
@@ -967,15 +954,15 @@ int main(){
 
 	 }while(inputEvent != 'F');
 
-	 for(int i ; i < nPDVs ; i++){
-		 // middleTimePDV[i] = middleTimePDV[i]/attendedPeoples[i];
-		 printf("\n%f", middleTimePDV[i]);
-	 }
+//	 for(int i ; i < nPDVs ; i++){
+//		 // middleTimePDV[i] = middleTimePDV[i]/attendedPeoples[i];
+//		 printf("\n%f", middleTimePDV[i]);
+//	 }
 
 
 
-	 printf("\n\nkbo\n\n");
-	 sort(eventsSchedule->events,comparatorEvents);
+//	 printf("\n\nkbo\n\n");
+//	 sort(eventsSchedule->events,comparatorEvents);
 	 // showSchedule(eventsSchedule);
 
 	 return 0;
