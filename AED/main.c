@@ -27,7 +27,12 @@ typedef struct Pdv{
 	double mediaTimeWait;
 
 	double sumTime;
+	double maxTime;
+
 	int attendedPeoples;
+
+	double pdvSumTime;
+	double pdvMaxTime;
 
 }Pdv;
 
@@ -127,6 +132,9 @@ int main(){
 		pastPdvs->mediaTimeWait = 0;
 		pastPdvs->finalTime = 0;
 		pastPdvs->sumTime = 0;
+		pastPdvs->maxTime = 0;
+		pastPdvs->pdvSumTime = 0;
+		pastPdvs->pdvMaxTime = 0;
 
 		append(pastPdvs,pastFaPdvs);
 
@@ -156,6 +164,9 @@ int main(){
 		newPdv->mediaTimeWait = 0;
 		newPdv->finalTime = 0;
 		newPdv->sumTime = 0;
+		newPdv->maxTime = 0;
+		newPdv->pdvSumTime = 0;
+		newPdv->pdvMaxTime = 0;
 
 		append(newPdv,newFaPdvs);
 
@@ -298,7 +309,19 @@ int main(){
 
 				minorTimeAttending->attendedPeoples++;
 				printf("%d       %f      %f\n", minorTimeAttending->index, timeEventC,minorTimeAttending->finalTime);
+
 				minorTimeAttending->sumTime += minTimeValue;
+				if(minTimeValue > minorTimeAttending->maxTime){
+
+					minorTimeAttending->maxTime = minTimeValue;
+
+				}
+
+				minorTimeAttending->pdvSumTime += (minorTimeAttending->finalTime - timeEventC);
+				if((minorTimeAttending->finalTime - timeEventC) > minorTimeAttending->pdvMaxTime){
+					minorTimeAttending->pdvMaxTime = (minorTimeAttending->finalTime - timeEventC);
+				}
+
 
 				break;
 			}
@@ -311,15 +334,12 @@ int main(){
 
 				break;
 			}
-		case 'F':
-			{
-				goto a;
-			}
 		}
 	}while (inputEvent != 'F');
 
-a:;
 	Element *medias = allPdvs->first;
+
+	printf("\n-------------------media de atendimento--------------");
 
 	while (medias != NULL) {
 
@@ -327,7 +347,22 @@ a:;
 
 		double coisa = pdv->sumTime/pdv->attendedPeoples;
 
-		printf("\nPDV: %d; media: %lf",pdv->index,coisa);
+		printf("\nPDV: %d; media: %lf; max: %lf",pdv->index,coisa,pdv->maxTime);
+
+		medias = medias->next;
+	}
+
+	printf("\n-------------------media de PDV--------------");
+
+	medias = allPdvs->first;
+
+	while (medias != NULL) {
+
+		Pdv *pdv = medias->value;
+
+		double coisa = pdv->pdvSumTime/pdv->attendedPeoples;
+
+		printf("\nPDV: %d; media: %lf; max: %lf",pdv->index,coisa,pdv->pdvMaxTime);
 
 		medias = medias->next;
 	}
